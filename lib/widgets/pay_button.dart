@@ -204,7 +204,9 @@ class _ThawaniPayBtnState extends State<ThawaniPayBtn> {
       if (isLoading)
         const Positioned.fill(
           child: Center(
-            child: CircularProgressIndicator(),
+            child: CircularProgressIndicator(
+              color: Color(0xFF33B0AC),
+            ),
           ),
         )
     ]);

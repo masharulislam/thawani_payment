@@ -138,64 +138,69 @@ class _ThawaniPayBtnState extends State<ThawaniPayBtn> {
   @override
   Widget build(BuildContext context) {
     return Stack(children: [
-      ElevatedButton(
-          style: buttonStyle,
-          onPressed: () async {
-            setState(() {
-              isLoading = true;
-            });
-            dataBack = await RequestHelper.postRequest(
-                api,
-                {
-                  "client_reference_id": clintID,
-                  "mode": "payment",
-                  "products": products,
-                  "success_url": widget.successUrl ??
-                      'https://abom.me/package/thawani/suc.php',
-                  "cancel_url": widget.cancelUrl ??
-                      "https://abom.me/package/thawani/can.php",
-                  widget.metadata != null ? "metadata" : widget.metadata: null,
-                },
-                testMode);
-            if (dataBack['code'] == 2004) {
-              createS().then((value) => {widget.onCreate(value)});
+      Container(
+        width: MediaQuery.of(context).size.width * 1,
+        height: MediaQuery.of(context).size.height * 0.092,
+        child: ElevatedButton(
+            style: buttonStyle,
+            onPressed: () async {
+              setState(() {
+                isLoading = true;
+              });
+              dataBack = await RequestHelper.postRequest(
+                  api,
+                  {
+                    "client_reference_id": clintID,
+                    "mode": "payment",
+                    "products": products,
+                    "success_url": widget.successUrl ??
+                        'https://abom.me/package/thawani/suc.php',
+                    "cancel_url": widget.cancelUrl ??
+                        "https://abom.me/package/thawani/can.php",
+                    widget.metadata != null ? "metadata" : widget.metadata:
+                        null,
+                  },
+                  testMode);
+              if (dataBack['code'] == 2004) {
+                createS().then((value) => {widget.onCreate(value)});
 
-              if (!mounted) return;
-              setState(() {
-                isLoading = false;
-              });
-              Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                      builder: (context) => PayWidget(
-                            api: widget.api,
-                            uri: dataBack['data']['session_id'],
-                            url: testMode == true
-                                ? 'https://uatcheckout.thawani.om/pay/${dataBack['data']['session_id']}?key=${widget.pKey}'
-                                : 'https://checkout.thawani.om/pay/${dataBack['data']['session_id']}?key=${widget.pKey}',
-                            paid: (statusClass) {
-                              payStatus(statusClass)
-                                  .then((value) => {widget.onPaid(value)});
-                            },
-                            unpaid: (statusClass) {
-                              payStatus(statusClass)
-                                  .then((value) => {widget.onCancelled(value)});
-                            },
-                            testMode: testMode,
-                          )));
-            } else if (dataBack['code'] != 2004) {
-              setState(() {
-                isLoading = false;
-              });
-              return widget.onError!(dataBack);
-            } else if (dataBack['code'] == null) {
-              setState(() {
-                isLoading = false;
-              });
-              return widget.onError!(dataBack);
-            }
-          },
-          child: child),
+                if (!mounted) return;
+                setState(() {
+                  isLoading = false;
+                });
+                Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                        builder: (context) => PayWidget(
+                              api: widget.api,
+                              uri: dataBack['data']['session_id'],
+                              url: testMode == true
+                                  ? 'https://uatcheckout.thawani.om/pay/${dataBack['data']['session_id']}?key=${widget.pKey}'
+                                  : 'https://checkout.thawani.om/pay/${dataBack['data']['session_id']}?key=${widget.pKey}',
+                              paid: (statusClass) {
+                                payStatus(statusClass)
+                                    .then((value) => {widget.onPaid(value)});
+                              },
+                              unpaid: (statusClass) {
+                                payStatus(statusClass).then(
+                                    (value) => {widget.onCancelled(value)});
+                              },
+                              testMode: testMode,
+                            )));
+              } else if (dataBack['code'] != 2004) {
+                setState(() {
+                  isLoading = false;
+                });
+                return widget.onError!(dataBack);
+              } else if (dataBack['code'] == null) {
+                setState(() {
+                  isLoading = false;
+                });
+                return widget.onError!(dataBack);
+              }
+            },
+            child: child),
+      ),
       if (isLoading)
         Positioned.fill(
           child: Container(
